@@ -18,7 +18,7 @@ class CategoryController extends Controller
         //
         $categories = Category::all();
         return view('admin.categories.index', [
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
 
@@ -77,8 +77,8 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         //
-         return view('admin.categories.edit', [
-            'category' => $category
+        return view('admin.categories.edit', [
+            'category' => $category,
         ]);
     }
 
@@ -88,7 +88,6 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         //
-        {
         //
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
@@ -114,7 +113,6 @@ class CategoryController extends Controller
             throw $error;
         }
     }
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -122,11 +120,10 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         //
-        try{
+        try {
             $category->delete();
             return redirect()->back();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             $error = ValidationException::withMessages([
                 'system_error' => ['System error!' . $e->getMessage()],
