@@ -16,7 +16,7 @@
                         <img src="{{ Storage::url($category->icon) }}" alt="" class="w-[50px] h-[50px]">
                         <h3 class="text-2xl font-bold text-indigo-950">{{ $category->name }}</h3>
                         <div class="flex flex-row items-center gap-x-3">
-                            <a href="#" class="px-5 py-3 font-bold text-white bg-indigo-700 rounded-full">Edit</a>
+                            <a href="{{ route('admin.categories.edit', $category) }}" class="px-5 py-3 font-bold text-white bg-indigo-700 rounded-full">Edit</a>
                             <form method="POST" action="{{ route('admin.categories.destroy', $category) }}">
                                 @csrf
                                 @method('DELETE')
