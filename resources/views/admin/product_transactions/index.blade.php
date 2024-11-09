@@ -13,13 +13,16 @@
             <div class="flex flex-col p-10 overflow-hidden bg-white shadow-sm gap-y-5 sm:rounded-lg">
                 @forelse ($product_transactions as $transaction)
                     <div class="flex flex-row items-center justify-between item-card">
+                          <a href="{{ route('product_transactions.show', $transaction) }}">
                         <div class="flex flex-row items-center gap-x-3">
                             <div>
                                 <h3 class="text-base text-slate-500">Total Transaction</h3>
                                 <p class="text-xl font-bold text-indigo-950 ">Rp {{ $transaction->total_amount }}</p>
                             </div>
                         </div>
-                        <div>
+                </a>
+
+                        <div class="flex-col hidden md:flex">
                             <p class="text-base text-slate-500">Date</p>
                             <h3 class="text-xl font-bold text-indigo-950">{{ $transaction->created_at }}</h3>
                         </div>
@@ -32,7 +35,7 @@
                                 <p class="text-sm font-bold text-white">PENDING</p>
                             </span>
                         @endif
-                        <div class="flex flex-row items-center gap-x-3">
+                        <div class="flex-row items-center hidden md:flex gap-x-3">
                             <a href="{{ route('product_transactions.show', $transaction) }}" class="px-5 py-3 font-bold text-white bg-indigo-700 rounded-full">View
                                 Details</a>
                         </div>

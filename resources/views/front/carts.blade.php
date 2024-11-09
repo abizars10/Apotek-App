@@ -36,31 +36,33 @@
         <div class="flex flex-col gap-4" id="itemsList">
             <!-- Softovac Rami -->
             @forelse ($my_carts as $cart)
-
-            <div class="py-3.5 pl-4 pr-[22px] bg-white rounded-2xl flex gap-1 items-center relative">
-                <img src="{{ Storage::url($cart->product->photo) }}"
-                    class="w-full max-w-[70px] max-h-[70px] object-contain" alt="">
-                <div class="flex flex-wrap items-center justify-between w-full gap-1">
-                    <div class="flex flex-col gap-1">
-                        <a href="details.html"
-                            class="text-base font-semibold stretched-link whitespace-nowrap w-[150px] truncate">
-                            {{ $cart->product->name }}
-                        </a>
-                        <p class="text-sm text-grey">
-                           Rp {{ $cart->product->price }}
-                        </p>
+                <div class="py-3.5 pl-4 pr-[22px] bg-white rounded-2xl flex gap-1 items-center relative">
+                    <img src="{{ Storage::url($cart->product->photo) }}"
+                        class="w-full max-w-[70px] max-h-[70px] object-contain" alt="">
+                    <div class="flex flex-wrap items-center justify-between w-full gap-1">
+                        <div class="flex flex-col gap-1">
+                            <h3 class="text-base font-semibold whitespace-nowrap w-[150px] truncate">
+                                {{ $cart->product->name }}
+                            </h3>
+                            <p class="text-sm text-grey product-price" data-price="{{ $cart->product->price }}">
+                                Rp {{ $cart->product->price }}
+                            </p>
+                        </div>
+                        <form action="{{ route('carts.destroy', $cart) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit">
+                                <img src="{{ asset('assets/svgs/ic-trash-can-filled.svg') }}" class="size-[30px]"
+                                    alt="">
+                            </button>
+                        </form>
                     </div>
-                    <button type="button">
-                        <img src="{{ asset('assets/svgs/ic-trash-can-filled.svg') }}" class="size-[30px]"
-                            alt="">
-                    </button>
                 </div>
-            </div>
 
             @empty
                 <p>Transactions not yet.</p>
             @endforelse
-          
+
         </div>
     </section>
 
@@ -75,46 +77,46 @@
                     alt="">
             </button>
         </div>
-        <div class="p-6 bg-white rounded-3xl" id="__detailsPayment">
+        <div class="p-6 bg-white rounded-3xl" id="__detailsPayment" style="display: none">
             <ul class="flex flex-col gap-5">
                 <li class="flex items-center justify-between">
                     <p class="text-base font-semibold first:font-normal">
                         Sub Total
                     </p>
-                    <p class="text-base font-semibold first:font-normal">
-                        Rp 890.000
+                    <p class="text-base font-semibold first:font-normal" id="checkout-sub-total">
+
                     </p>
                 </li>
                 <li class="flex items-center justify-between">
                     <p class="text-base font-semibold first:font-normal">
                         PPN 11%
                     </p>
-                    <p class="text-base font-semibold first:font-normal">
-                        Rp 89.000
+                    <p class="text-base font-semibold first:font-normal" id="checkout-ppn">
+
                     </p>
                 </li>
                 <li class="flex items-center justify-between">
                     <p class="text-base font-semibold first:font-normal">
                         Insurance 23%
                     </p>
-                    <p class="text-base font-semibold first:font-normal">
-                        Rp 120.000
+                    <p class="text-base font-semibold first:font-normal" id="checkout-insurance">
+
                     </p>
                 </li>
                 <li class="flex items-center justify-between">
                     <p class="text-base font-semibold first:font-normal">
                         Delivery (Promo)
                     </p>
-                    <p class="text-base font-semibold first:font-normal">
-                        Rp 10.000
+                    <p class="text-base font-semibold first:font-normal" id="checkout-delivery-fee">
+
                     </p>
                 </li>
                 <li class="flex items-center justify-between">
                     <p class="text-base font-bold first:font-normal">
                         Grand Total
                     </p>
-                    <p class="text-base font-bold first:font-normal text-primary">
-                        Rp 3.290.000
+                    <p class="text-base font-bold first:font-normal text-primary" id="checkout-grand-total">
+
                     </p>
                 </li>
             </ul>
@@ -154,13 +156,13 @@
                 <div class="inline-flex items-center gap-2.5">
                     <img src="{{ asset('assets/svgs/ic-bank.svg') }}" class="size-5" alt="">
                     <p class="text-base font-semibold">
-                        Send Payment to
+                        Bank Parma Abizar
                     </p>
                 </div>
                 <div class="inline-flex items-center gap-2.5">
                     <img src="{{ asset('assets/svgs/ic-security-card.svg') }}" class="size-5" alt="">
                     <p class="text-base font-semibold">
-                        083902093092
+                        883902093092
                     </p>
                 </div>
             </div>
@@ -178,7 +180,10 @@
                     class="transition-all duration-300 -rotate-180 size-5" alt="">
             </button>
         </div>
-        <form action="" method="" class="p-6 bg-white rounded-3xl" id="deliveryForm">
+        @if ($errors->any()) <div class="alert alert-danger"> <ul> @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach </ul> </div> @endif
+        <form enctype="multipart/form-data" action="{{ route('product_transactions.store') }}" method="POST"
+            class="p-6 bg-white rounded-3xl" id="deliveryForm">
+            @csrf
             <div class="flex flex-col gap-5">
                 <!-- Address -->
                 <div class="flex flex-col gap-2.5">
@@ -197,14 +202,14 @@
                 <!-- Post Code -->
                 <div class="flex flex-col gap-2.5">
                     <label for="postcode" class="text-base font-semibold">Post Code</label>
-                    <input type="number" name="postcode" id="postcode__"
+                    <input type="number" name="post_code" id="postcode__"
                         style="background-image: url('{{ asset('assets/svgs/ic-house.svg') }}')" class="form-input"
                         value="22081882">
                 </div>
                 <!-- Phone Number -->
                 <div class="flex flex-col gap-2.5">
                     <label for="phonenumber" class="text-base font-semibold">Phone Number</label>
-                    <input type="number" name="phonenumber" id="phonenumber__"
+                    <input type="number" name="phone_number" id="phonenumber__"
                         style="background-image: url('{{ asset('assets/svgs/ic-phone.svg') }}')" class="form-input"
                         value="602192301923">
                 </div>
@@ -220,38 +225,83 @@
                 <!-- Proof of Payment -->
                 <div class="flex flex-col gap-2.5">
                     <label for="proof_of_payment" class="text-base font-semibold">Proof of Payment</label>
-                    <input type="file" name="proof_of_payment" id="proof_of_payment__"
+                    <input type="file" name="proof" id="proof_of_payment__"
                         style="background-image: url('{{ asset('assets/svgs/ic-folder-add.svg') }}')"
                         class="form-input">
                 </div>
             </div>
+
+            <!-- Floating grand total -->
+            <div
+                class="fixed z-50 bottom-[30px] bg-black rounded-3xl p-5 left-1/2 -translate-x-1/2 w-[calc(100dvw-32px)] max-w-[425px]">
+                <section class="flex items-center justify-between gap-5">
+                    <div>
+                        <p class="text-sm text-grey mb-0.5">
+                            Grand Total
+                        </p>
+                        <p class="text-lg min-[350px]:text-2xl font-bold text-white" id="checkout-grand-total-price">
+                        </p>
+                    </div>
+                    <button type="submit"
+                        class="inline-flex items-center justify-center px-5 py-3 text-base font-bold text-white rounded-full w-max bg-primary whitespace-nowrap">
+                        Confirm
+                    </button>
+                </section>
+            </div>
         </form>
     </section>
 
-    <!-- Floating grand total -->
-    <div
-        class="fixed
-                        z-50 bottom-[30px] bg-black rounded-3xl p-5 left-1/2 -translate-x-1/2 w-[calc(100dvw-32px)]
-                        max-w-[425px]">
-        <section class="flex items-center justify-between gap-5">
-            <div>
-                <p class="text-sm text-grey mb-0.5">
-                    Grand Total
-                </p>
-                <p class="text-lg min-[350px]:text-2xl font-bold text-white">
-                    Rp 3.290.000
-                </p>
-            </div>
-            <button type="button"
-                class="inline-flex items-center justify-center px-5 py-3 text-base font-bold text-white rounded-full w-max bg-primary whitespace-nowrap">
-                Confirm
-            </button>
-        </section>
-    </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script src="{{ asset('scripts/global..js') }}"></script>
+    <script src="{{ asset('scripts/global.js') }}"></script>
+    <script>
+        function calculatePrice() {
+            let subTotal = 0;
+            let deliveryFee = 10000;
+
+            document.querySelectorAll('.product-price').forEach(item => {
+                subTotal += parseFloat(item.getAttribute('data-price'));
+            });
+
+            document.getElementById('checkout-delivery-fee').textContent = 'Rp ' + deliveryFee.toLocaleString('id', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            document.getElementById('checkout-sub-total').textContent = 'Rp ' + subTotal.toLocaleString('id', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            const tax = 11 * subTotal / 100
+            document.getElementById('checkout-ppn').textContent = 'Rp ' + tax.toLocaleString('id', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            const insurance = 23 * subTotal / 100
+            document.getElementById('checkout-insurance').textContent = 'Rp ' + insurance.toLocaleString('id', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            const grandTotal = subTotal + tax + insurance + deliveryFee;
+            document.getElementById('checkout-grand-total').textContent = 'Rp ' + grandTotal.toLocaleString('id', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            document.getElementById('checkout-grand-total-price').textContent = 'Rp ' + grandTotal.toLocaleString('id', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            calculatePrice();
+        })
+    </script>
 </body>
 
 </html>
