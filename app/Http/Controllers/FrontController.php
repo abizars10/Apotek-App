@@ -25,6 +25,14 @@ class FrontController extends Controller
         ]);
     }
 
+    public function category(Category $category){
+        $products = Product::where('category_id', $category->id)->with('category')->get();
+        return view('front.category', [
+            'products' => $products,
+            'category' => $category,
+        ]);
+    }
+
     public function search(Request $request){
         $keyword = $request->input('keyword');
 
